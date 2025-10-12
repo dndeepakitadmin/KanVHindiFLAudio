@@ -4,13 +4,11 @@ from indic_transliteration import sanscript
 from indic_transliteration.sanscript import transliterate
 from aksharamukha.transliterate import process
 from gtts import gTTS
-import speech_recognition as sr
-from pydub import AudioSegment
 import tempfile
 
 st.set_page_config(page_title="Hindi to Kannada Learning", layout="centered")
 st.title("📝 Learn Kannada using Hindi script")
-st.subheader("Type or Upload Hindi Audio to Learn Kannada")
+st.subheader("Type Hindi text to Learn Kannada")
 
 # ---------- Function to generate audio ----------
 def generate_audio_kannada(kannada_text):
@@ -19,37 +17,8 @@ def generate_audio_kannada(kannada_text):
     tts.save(temp_file.name)
     return temp_file.name
 
-# ---------- Input Method ----------
-input_method = st.radio("Select Input Method:", ["Type Hindi Text", "Upload Hindi Audio"])
-text = ""
-
-# ---------- 1. Typed Input ----------
-if input_method == "Type Hindi Text":
-    text = st.text_area("Enter Hindi text here (e.g., आप कैसे हैं?)", height=120)
-
-# ---------- 2. Upload Audio ----------
-elif input_method == "Upload Hindi Audio":
-    audio_file = st.file_uploader("Upload Hindi Audio (mp3/wav)", type=["mp3","wav"])
-    if audio_file:
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp_file:
-            if audio_file.name.endswith(".mp3"):
-                sound = AudioSegment.from_file(audio_file)
-                sound.export(tmp_file.name, format="wav")
-                audio_path = tmp_file.name
-            else:
-                audio_path = tmp_file.name
-                audio_file.seek(0)
-                with open(audio_path, "wb") as f:
-                    f.write(audio_file.getbuffer())
-        # Speech Recognition
-        recognizer = sr.Recognizer()
-        with sr.AudioFile(audio_path) as source:
-            audio_data = recognizer.record(source)
-            try:
-                text = recognizer.recognize_google(audio_data, language="hi-IN")
-                st.success(f"Detected Hindi Text: {text}")
-            except Exception as e:
-                st.error(f"Could not recognize audio: {e}")
+# ---------- Input ----------
+text = st.text_area("Enter Hindi text here (e.g., आप कैसे हैं?)", height=120)
 
 # ---------- Translate & Flashcards ----------
 translate_clicked = st.button("Translate")
@@ -98,4 +67,4 @@ if translate_clicked:
         except Exception as e:
             st.error(f"Error: {e}")
     else:
-        st.warning("Please type or upload some Hindi input!")
+        st.warning("Please type some Hindi input!")
