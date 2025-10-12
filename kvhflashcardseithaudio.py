@@ -7,14 +7,10 @@ from gtts import gTTS
 import speech_recognition as sr
 from pydub import AudioSegment
 import tempfile
-import os
-
-# For live microphone input
-from streamlit_webrtc import webrtc_streamer, AudioProcessorBase, WebRtcMode
 
 st.set_page_config(page_title="Hindi to Kannada Learning", layout="centered")
 st.title("📝 Learn Kannada using Hindi script")
-st.subheader("Type, Upload Audio, or Speak in Hindi to Learn Kannada")
+st.subheader("Type or Upload Hindi Audio to Learn Kannada")
 
 # ---------- Function to generate audio ----------
 def generate_audio_kannada(kannada_text):
@@ -23,9 +19,8 @@ def generate_audio_kannada(kannada_text):
     tts.save(temp_file.name)
     return temp_file.name
 
-# ---------- Input Method Selection ----------
-input_method = st.radio("Select Input Method:", ["Type Hindi Text", "Upload Hindi Audio", "Speak Live"])
-
+# ---------- Input Method ----------
+input_method = st.radio("Select Input Method:", ["Type Hindi Text", "Upload Hindi Audio"])
 text = ""
 
 # ---------- 1. Typed Input ----------
@@ -56,20 +51,7 @@ elif input_method == "Upload Hindi Audio":
             except Exception as e:
                 st.error(f"Could not recognize audio: {e}")
 
-# ---------- 3. Live Microphone Input ----------
-elif input_method == "Speak Live":
-    class AudioProcessor(AudioProcessorBase):
-        def __init__(self):
-            self.audio_data = None
-
-        def recv_audio(self, frame):
-            self.audio_data = frame.to_ndarray()
-            return frame
-
-    st.info("Click 'Start' to speak in Hindi and press 'Translate' when done.")
-    ctx = webrtc_streamer(key="live-audio", mode=WebRtcMode.SENDONLY, audio_processor_factory=AudioProcessor)
-
-# ---------- Single Translate Button ----------
+# ---------- Translate & Flashcards ----------
 translate_clicked = st.button("Translate")
 
 if translate_clicked:
@@ -116,4 +98,4 @@ if translate_clicked:
         except Exception as e:
             st.error(f"Error: {e}")
     else:
-        st.warning("Please type, upload, or speak some Hindi input!")
+        st.warning("Please type or upload some Hindi input!")
