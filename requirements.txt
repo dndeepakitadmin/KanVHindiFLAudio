@@ -1,0 +1,5 @@
+streamlit>=1.25.0
+deep-translator>=1.10.1
+indic-transliteration>=1.8.2
+aksharamukha>=2.0.8
+gTTS>=2.3.0
