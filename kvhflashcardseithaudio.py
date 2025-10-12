@@ -69,49 +69,51 @@ elif input_method == "Speak Live":
     st.info("Click 'Start' to speak in Hindi and press 'Translate' when done.")
     ctx = webrtc_streamer(key="live-audio", mode=WebRtcMode.SENDONLY, audio_processor_factory=AudioProcessor)
 
-# ---------- Translate & Flashcards ----------
-if st.button("Translate") and text.strip():
-    try:
-        # Sentence translation
-        kannada = GoogleTranslator(source="hi", target="kn").translate(text)
-        kannada_english = transliterate(kannada, sanscript.KANNADA, sanscript.ITRANS)
-        kannada_in_hindi = process('Kannada', 'Devanagari', kannada)
+# ---------- Single Translate Button ----------
+translate_clicked = st.button("Translate")
 
-        # Display outputs
-        st.markdown("### 🔹 Translation Results")
-        st.markdown(f"**Hindi Input:**  \n:blue[{text}]")
-        st.markdown(f"**Kannada Translation:**  \n:green[{kannada}]")
-        st.markdown(f"**Kannada in Hindi letters:**  \n:orange[{kannada_in_hindi}]")
-        st.markdown(f"**Kannada in English phonetics:**  \n`{kannada_english}`")
+if translate_clicked:
+    if text.strip():
+        try:
+            # ---------- Sentence Translation ----------
+            kannada = GoogleTranslator(source="hi", target="kn").translate(text)
+            kannada_english = transliterate(kannada, sanscript.KANNADA, sanscript.ITRANS)
+            kannada_in_hindi = process('Kannada', 'Devanagari', kannada)
 
-        # Sentence audio
-        sentence_audio_file = generate_audio_kannada(kannada)
-        st.audio(sentence_audio_file)
+            # ---------- Display Sentence Outputs ----------
+            st.markdown("### 🔹 Translation Results")
+            st.markdown(f"**Hindi Input:**  \n:blue[{text}]")
+            st.markdown(f"**Kannada Translation:**  \n:green[{kannada}]")
+            st.markdown(f"**Kannada in Hindi letters:**  \n:orange[{kannada_in_hindi}]")
+            st.markdown(f"**Kannada in English phonetics:**  \n`{kannada_english}`")
 
-        # Flashcards
-        st.markdown("### 🎴 Flashcards for Each Word")
-        words = text.strip().split()
-        for word in words:
-            try:
-                kannada_word = GoogleTranslator(source="hi", target="kn").translate(word)
-                kannada_in_hindi_word = process('Kannada', 'Devanagari', kannada_word)
-                kannada_phonetic = transliterate(kannada_word, sanscript.KANNADA, sanscript.ITRANS)
+            # Sentence audio
+            sentence_audio_file = generate_audio_kannada(kannada)
+            st.audio(sentence_audio_file)
 
-                with st.expander(f"Flashcard: {word}"):
-                    st.markdown(f"**Hindi:** {word}")
-                    st.markdown(f"**Kannada:** {kannada_word}")
-                    st.markdown(f"**Kannada in Hindi letters:** {kannada_in_hindi_word}")
-                    st.markdown(f"**Phonetic (English):** `{kannada_phonetic}`")
-                    
-                    # Flashcard audio
-                    word_audio_file = generate_audio_kannada(kannada_word)
-                    st.audio(word_audio_file)
+            # ---------- Flashcards ----------
+            st.markdown("### 🎴 Flashcards for Each Word")
+            words = text.strip().split()
+            for word in words:
+                try:
+                    kannada_word = GoogleTranslator(source="hi", target="kn").translate(word)
+                    kannada_in_hindi_word = process('Kannada', 'Devanagari', kannada_word)
+                    kannada_phonetic = transliterate(kannada_word, sanscript.KANNADA, sanscript.ITRANS)
 
-            except Exception as e:
-                st.warning(f"Cannot translate the word: {word}")
+                    with st.expander(f"Flashcard: {word}"):
+                        st.markdown(f"**Hindi:** {word}")
+                        st.markdown(f"**Kannada:** {kannada_word}")
+                        st.markdown(f"**Kannada in Hindi letters:** {kannada_in_hindi_word}")
+                        st.markdown(f"**Phonetic (English):** `{kannada_phonetic}`")
+                        
+                        # Flashcard audio
+                        word_audio_file = generate_audio_kannada(kannada_word)
+                        st.audio(word_audio_file)
 
-    except Exception as e:
-        st.error(f"Error: {e}")
+                except Exception as e:
+                    st.warning(f"Cannot translate the word: {word}")
 
-elif st.button("Translate"):
-    st.warning("Please type, upload, or speak some Hindi input!")
+        except Exception as e:
+            st.error(f"Error: {e}")
+    else:
+        st.warning("Please type, upload, or speak some Hindi input!")
